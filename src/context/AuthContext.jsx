@@ -9,7 +9,6 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Restore existing session on mount
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         setUser(session.user)
@@ -19,10 +18,15 @@ export function AuthProvider({ children }) {
       }
     })
 
-    // Listen for login / logout / token refresh
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth event:', event, session?.user?.id)
+
       if (session?.user) {
         setUser(session.user)
+        // On first signup, create the profile row
+        if (event === 'SIGNED_IN') {
+          await ensureProfile(session.user)
+        }
         fetchProfile(session.user.id)
       } else {
         setUser(null)
@@ -34,38 +38,70 @@ export function AuthProvider({ children }) {
     return () => subscription.unsubscribe()
   }, [])
 
+  // Creates profile row if it doesn't exist yet
+  const ensureProfile = async (authUser) => {
+    const { data: existing } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('id', authUser.id)
+      .single()
+
+    if (!existing) {
+      const { error } = await supabase.from('profiles').insert({
+        id:               authUser.id,
+        name:             authUser.user_metadata?.name || '',
+        email:            authUser.email,
+        headline:         authUser.user_metadata?.headline || '',
+        linkedin_url:     authUser.user_metadata?.linkedin_url || '',
+        posts_analyzed:   0,
+        drafts_generated: 0,
+      })
+      if (error) console.error('ensureProfile error:', error.message)
+      else console.log('Profile row created for', authUser.email)
+    }
+  }
+
   const fetchProfile = async (userId) => {
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', userId)
       .single()
+    if (error) console.error('fetchProfile error:', error.message)
     if (!error && data) setProfile(data)
     setLoading(false)
   }
 
   // ── Sign up ───────────────────────────────────────────────────────────────
   const signup = async ({ name, email, password, headline, linkedinUrl }) => {
-    // 1. Create auth user
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { name } },
+      options: {
+        data: {
+          name,
+          headline:    headline || '',
+          linkedin_url: linkedinUrl || '',
+        },
+      },
     })
     if (error) return { error: error.message }
 
-    // 2. Upsert profile row (also covered by the DB trigger, but be explicit)
+    // Manually insert profile right away as a safety net
+    // (the onAuthStateChange trigger will also try, but this ensures it runs)
     if (data.user) {
       const { error: profileError } = await supabase.from('profiles').upsert({
         id:               data.user.id,
-        name:             name,
-        email:            email,
+        name,
+        email,
         headline:         headline || '',
         linkedin_url:     linkedinUrl || '',
         posts_analyzed:   0,
         drafts_generated: 0,
-      })
-      if (profileError) console.error('Profile upsert error:', profileError.message)
+      }, { onConflict: 'id' })
+
+      if (profileError) console.error('Signup profile upsert error:', profileError.message)
+      else console.log('Profile upserted for', email)
     }
 
     return { success: true }
@@ -92,6 +128,7 @@ export function AuthProvider({ children }) {
       .eq('id', user.id)
       .select()
       .single()
+    if (error) console.error('updateProfile error:', error.message)
     if (!error && data) setProfile(data)
     return error ? { error: error.message } : { success: true }
   }
