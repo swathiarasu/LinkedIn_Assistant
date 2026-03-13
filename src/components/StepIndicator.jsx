@@ -1,6 +1,6 @@
 import './StepIndicator.css'
 
-const STEPS = ['Paste Posts', 'Your Voice', 'Pick Topic', 'Get Drafts']
+const STEPS = ['Paste Posts', 'Your Persona', 'Pick Topic', 'Get Drafts']
 
 export default function StepIndicator({ current }) {
   return (

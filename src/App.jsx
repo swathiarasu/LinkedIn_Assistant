@@ -15,7 +15,7 @@ function MainApp() {
   const { user, profile } = useAuth()
   const [step, setStep]           = useState(0)
   const [posts, setPosts]         = useState([])
-  const [voiceProfile, setVoiceProfile] = useState(null)
+  const [personaProfile, setPersonaProfile] = useState(null)
   const [topic, setTopic]         = useState('')
   const [ideaSeed, setIdeaSeed]   = useState('')
   const [drafts, setDrafts]       = useState([])
@@ -25,7 +25,7 @@ function MainApp() {
   const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
 
   const restart = () => {
-    setPosts([]); setVoiceProfile(null)
+    setPosts([]); setPersonaProfile(null)
     setTopic(''); setIdeaSeed('')
     setDrafts([]); setStep(0)
   }
@@ -36,10 +36,10 @@ function MainApp() {
         <div className="header-inner">
           <div className="logo">
             <span className="logo-icon">in</span>
-            <span className="logo-text">Voice Assistant</span>
+            <span className="logo-text">Persona Assistant</span>
           </div>
           <div className="header-right">
-            <span className="tagline">Learns how you write. Posts that sound like you.</span>
+            <span className="tagline">Learns your persona. Posts that sound like you.</span>
             <button className="avatar-btn" onClick={() => setShowProfile(true)} title="Your profile">
               {initials}
             </button>
@@ -54,7 +54,7 @@ function MainApp() {
         {step === 1 && (
           <ProfileStep
             posts={posts}
-            onDone={(p) => { setVoiceProfile(p); setStep(2) }}
+            onDone={(p) => { setPersonaProfile(p); setStep(2) }}
             onBack={() => setStep(0)}
             ideaSeed={ideaSeed}
             setIdeaSeed={setIdeaSeed}
@@ -62,7 +62,7 @@ function MainApp() {
         )}
         {step === 2 && (
           <TopicStep
-            profile={voiceProfile}
+            profile={personaProfile}
             topic={topic}
             setTopic={setTopic}
             onDone={() => setStep(3)}
@@ -71,7 +71,7 @@ function MainApp() {
         )}
         {step === 3 && (
           <DraftsStep
-            profile={voiceProfile}
+            profile={personaProfile}
             topic={topic}
             ideaSeed={ideaSeed}
             drafts={drafts}

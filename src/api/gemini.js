@@ -61,11 +61,11 @@ const parseJSON = (text) => {
   return null
 }
 
-// ─── Analyze voice profile from pasted posts ─────────────────────────────────
-export const analyzeVoice = async (posts) => {
+// ─── Analyze persona profile from pasted posts ─────────────────────────────────
+export const analyzePersona = async (posts) => {
   const postsText = posts.join('\n\n---\n\n')
 
-  const system = `You are an expert LinkedIn voice analyst. Study the provided posts and return a JSON object with EXACTLY these keys:
+  const system = `You are an expert LinkedIn persona analyst. Study the provided posts and return a JSON object with EXACTLY these keys:
 {
   "name": "inferred author name, or You if unclear",
   "tone": "2-4 word phrase e.g. Analytical and direct",
@@ -89,7 +89,7 @@ Return ONLY the JSON object. No explanation, no markdown, no extra text.`
   const profile = parseJSON(raw)
   if (!profile || typeof profile !== 'object' || Array.isArray(profile)) {
     console.error('Raw Gemini response:', raw)
-    throw new Error('Could not parse voice profile. Please try again.')
+    throw new Error('Could not parse persona profile. Please try again.')
   }
   return profile
 }

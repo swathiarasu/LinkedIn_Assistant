@@ -23,7 +23,7 @@ export default function PasteStep({ onDone }) {
       .filter(p => p.length > 30)
 
     if (posts.length < 3) {
-      setError('Please paste at least 3 posts so the AI can learn your voice properly.')
+      setError('Please paste at least 3 posts so the AI can learn your persona properly.')
       return
     }
     setError('')
@@ -41,7 +41,7 @@ export default function PasteStep({ onDone }) {
         <h2 className="paste-title">Paste your LinkedIn posts</h2>
         <p className="paste-sub">
           Copy 5–15 of your past posts and paste them below, separated by a blank line.
-          The more you share, the better the AI learns your voice.
+          The more you share, the better the AI learns your persona.
         </p>
 
         <textarea
@@ -63,7 +63,7 @@ export default function PasteStep({ onDone }) {
           </div>
           {error && <p className="paste-error">{error}</p>}
           <Btn primary onClick={handleContinue} disabled={text.trim().length < 100}>
-            Analyze my voice →
+            Analyze my persona →
           </Btn>
         </div>
       </Card>

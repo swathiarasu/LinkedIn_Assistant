@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { analyzeVoice } from '../api/gemini'
+import { analyzePersona } from '../api/gemini'
 import Card from './Card'
 import Btn from './Btn'
 import Tag from './Tag'
@@ -17,7 +17,7 @@ export default function ProfileStep({ posts, onDone, onBack, ideaSeed, setIdeaSe
     setLoading(true)
     setError('')
     try {
-      const p = await analyzeVoice(posts)
+      const p = await analyzePersona(posts)
       setProfile(p)
     } catch (e) {
       setError(e.message || 'Something went wrong analyzing your posts.')
@@ -29,7 +29,7 @@ export default function ProfileStep({ posts, onDone, onBack, ideaSeed, setIdeaSe
     return (
       <Card className="center-card">
         <div className="spinner" />
-        <p className="loading-title">Analyzing your voice...</p>
+        <p className="loading-title">Analyzing your persona...</p>
         <p className="loading-sub">Reading {posts.length} posts · Detecting tone, themes &amp; patterns</p>
         <div className="progress-bar"><div className="progress-fill" /></div>
       </Card>
@@ -55,10 +55,10 @@ export default function ProfileStep({ posts, onDone, onBack, ideaSeed, setIdeaSe
           <div className="avatar">{(profile.name || 'Y')[0].toUpperCase()}</div>
           <div>
             <p className="profile-name">{profile.name}</p>
-            <div className="voice-pills">
-              <span className="voice-pill">{profile.tone}</span>
-              <span className="voice-dot">·</span>
-              <span className="voice-pill">{profile.style}</span>
+            <div className="persona-pills">
+              <span className="persona-pill">{profile.tone}</span>
+              <span className="persona-dot">·</span>
+              <span className="persona-pill">{profile.style}</span>
             </div>
           </div>
         </div>
