@@ -9,7 +9,7 @@
 }
 
 .profile-panel {
-  width: 400px;
+  width: 420px;
   max-width: 100vw;
   background: #fff;
   height: 100vh;
@@ -25,7 +25,6 @@
   to   { transform: translateX(0);    opacity: 1; }
 }
 
-/* ── Panel header ── */
 .panel-header {
   display: flex;
   justify-content: space-between;
@@ -56,7 +55,6 @@
 }
 .close-btn:hover { background: #f4f2ee; color: #1a1a1a; }
 
-/* ── Hero ── */
 .pp-hero {
   display: flex;
   align-items: center;
@@ -84,7 +82,6 @@
 .pp-email    { font-size: 12px; color: #888; margin-bottom: 3px; }
 .pp-headline { font-size: 12px; color: #0a66c2; font-weight: 500; }
 
-/* ── Stats ── */
 .pp-stats {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -104,8 +101,42 @@
 .stat-num   { font-size: 18px; font-weight: 700; color: #0a66c2; }
 .stat-label { font-size: 11px; color: #aaa; text-align: center; }
 
-/* ── Sections ── */
-.pp-section { padding: 1.25rem 1.5rem; border-bottom: 1px solid #f0ede8; }
+/* ── Tabs ── */
+.pp-tabs {
+  display: flex;
+  border-bottom: 1px solid #f0ede8;
+  padding: 0 1.5rem;
+}
+
+.pp-tab {
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #888;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.15s, border-color 0.15s;
+  font-family: inherit;
+  margin-bottom: -1px;
+}
+.pp-tab:hover { color: #1a1a1a; }
+.pp-tab.active { color: #0a66c2; border-bottom-color: #0a66c2; }
+
+.tab-count {
+  background: #0a66c2;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+}
+
+.pp-section { padding: 1.25rem 1.5rem; flex: 1; }
 
 .pp-section-header {
   display: flex;
@@ -125,11 +156,11 @@
   border-radius: 6px;
   padding: 4px 12px;
   cursor: pointer;
+  font-family: inherit;
 }
 .edit-btn:hover { background: #f0f7ff; }
 
-/* ── Detail list ── */
-.detail-list { display: flex; flex-direction: column; gap: 0; }
+.detail-list { display: flex; flex-direction: column; }
 
 .detail-row {
   display: flex;
@@ -160,16 +191,9 @@
 .pp-link { color: #0a66c2; text-decoration: none; font-size: 12px; }
 .pp-link:hover { text-decoration: underline; }
 
-/* ── Edit form ── */
 .edit-form { display: flex; flex-direction: column; gap: 12px; }
-
 .field { display: flex; flex-direction: column; gap: 5px; }
-
-.field-label {
-  font-size: 12px;
-  font-weight: 500;
-  color: #555;
-}
+.field-label { font-size: 12px; font-weight: 500; color: #555; }
 
 .field-input {
   padding: 9px 12px;
@@ -179,6 +203,7 @@
   outline: none;
   background: #fafaf9;
   transition: border-color 0.2s;
+  font-family: inherit;
 }
 .field-input:focus { border-color: #0a66c2; background: #fff; }
 
@@ -199,10 +224,11 @@
   font-size: 13px;
   color: #666;
   cursor: pointer;
+  font-family: inherit;
 }
 .cancel-btn:hover { background: #f4f2ee; }
 
-.save-btn {
+.save-btn-profile {
   padding: 8px 16px;
   background: #0a66c2;
   color: #fff;
@@ -211,12 +237,12 @@
   border: none;
   border-radius: 8px;
   cursor: pointer;
+  font-family: inherit;
 }
-.save-btn:hover { background: #004182; }
+.save-btn-profile:hover:not(:disabled) { background: #004182; }
+.save-btn-profile:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* ── Save toast ── */
 .save-toast {
-  margin: 0 1.5rem;
   padding: 10px 14px;
   background: #e8f5eb;
   border: 1px solid #a3d9ac;
@@ -225,6 +251,111 @@
   font-weight: 500;
   color: #2d7a3a;
   text-align: center;
+}
+
+.auth-badge {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12px;
+  color: #888;
+  line-height: 1.5;
+  background: #f9f8f6;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.auth-badge-icon { flex-shrink: 0; }
+.auth-badge strong { color: #3ecf8e; }
+
+/* ── Saved posts tab ── */
+.posts-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 2rem 0;
+  color: #888;
+  font-size: 13px;
+  justify-content: center;
+}
+
+.spinner-sm {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #e0ddd8;
+  border-top-color: #0a66c2;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.posts-empty {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+.posts-empty-icon { font-size: 32px; margin-bottom: 10px; }
+.posts-empty-text { font-size: 15px; font-weight: 600; color: #333; margin-bottom: 4px; }
+.posts-empty-sub  { font-size: 13px; color: #aaa; }
+
+.saved-posts-list { display: flex; flex-direction: column; gap: 12px; }
+
+.saved-post-card {
+  border: 1px solid #e0ddd8;
+  border-radius: 10px;
+  padding: 12px 14px;
+  background: #fafaf9;
+}
+
+.sp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+  gap: 10px;
+}
+
+.sp-topic { font-size: 13px; font-weight: 600; color: #1a1a1a; margin-bottom: 2px; }
+.sp-label { font-size: 11px; color: #0a66c2; margin-bottom: 2px; }
+.sp-date  { font-size: 11px; color: #aaa; }
+
+.sp-actions { display: flex; gap: 5px; flex-shrink: 0; }
+
+.sp-copy-btn {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid #e0ddd8;
+  background: transparent;
+  color: #666;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.sp-copy-btn:hover { border-color: #0a66c2; color: #0a66c2; }
+.sp-copy-btn.copied { background: #e8f5eb; border-color: #a3d9ac; color: #2d7a3a; }
+
+.sp-delete-btn {
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid #f5c0c0;
+  background: transparent;
+  color: #b74444;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.sp-delete-btn:hover { background: #fff4f4; }
+.sp-delete-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.sp-text {
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.65;
+  color: #333;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
 }
 
 /* ── Footer ── */
@@ -245,5 +376,6 @@
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.15s;
+  font-family: inherit;
 }
 .signout-btn:hover { background: #fff4f4; }
