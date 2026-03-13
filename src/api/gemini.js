@@ -1,8 +1,8 @@
 // Gemini Flash API
-// Model: gemini-2.0-flash (free tier at aistudio.google.com)
+// Model: gemini-2.5-flash (free tier at aistudio.google.com)
 
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY
-const BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent'
+const BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent'
 
 const callGemini = async (systemPrompt, userMessage, maxTokens = 2048) => {
   const res = await fetch(`${BASE_URL}?key=${API_KEY}`, {
