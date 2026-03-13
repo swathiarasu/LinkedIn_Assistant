@@ -122,8 +122,8 @@ Return ONLY the JSON array. No markdown, no explanation.`
 
   const raw = await callGemini(
     system,
-    `Topic: ${topic}${memCtx}\n\nVoice profile:\n${JSON.stringify(profile, null, 2)}`,
-    2048
+    `Topic I want to post about: ${topic}${memCtx}\n\nMy voice profile:\n${JSON.stringify(profile, null, 2)}`,
+    4000
   )
 
   const drafts = parseJSON(raw)
