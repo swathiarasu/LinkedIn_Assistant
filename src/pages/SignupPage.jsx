@@ -8,15 +8,16 @@ export default function SignupPage({ onSwitch }) {
     name: '', email: '', password: '', confirm: '',
     headline: '', linkedinUrl: '',
   })
-  const [error, setError] = useState('')
+  const [error, setError]     = useState('')
   const [loading, setLoading] = useState(false)
-  const [step, setStep] = useState(1) // 2-step signup
+  const [step, setStep]       = useState(1)
+  const [emailSent, setEmailSent] = useState(false)
 
   const set = (k, v) => { setForm(f => ({ ...f, [k]: v })); setError('') }
 
   const validateStep1 = () => {
-    if (!form.name.trim()) return 'Please enter your name.'
-    if (!form.email.trim()) return 'Please enter your email.'
+    if (!form.name.trim())   return 'Please enter your name.'
+    if (!form.email.trim())  return 'Please enter your email.'
     if (!/\S+@\S+\.\S+/.test(form.email)) return 'Please enter a valid email.'
     if (form.password.length < 6) return 'Password must be at least 6 characters.'
     if (form.password !== form.confirm) return 'Passwords do not match.'
@@ -30,18 +31,49 @@ export default function SignupPage({ onSwitch }) {
     setStep(2)
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
-    const res = signup({
-      name: form.name.trim(),
-      email: form.email.trim().toLowerCase(),
-      password: form.password,
-      headline: form.headline.trim(),
+    const res = await signup({
+      name:        form.name.trim(),
+      email:       form.email.trim().toLowerCase(),
+      password:    form.password,
+      headline:    form.headline.trim(),
       linkedinUrl: form.linkedinUrl.trim(),
     })
-    if (res.error) setError(res.error)
+    if (res?.error) {
+      setError(res.error)
+    } else {
+      setEmailSent(true)
+    }
     setLoading(false)
+  }
+
+  // ── Email confirmation screen ─────────────────────────────────────────────
+  if (emailSent) {
+    return (
+      <div className="auth-shell">
+        <div className="auth-card" style={{ justifyContent: 'center', textAlign: 'center' }}>
+          <div className="auth-logo" style={{ justifyContent: 'center' }}>
+            <span className="auth-logo-icon">in</span>
+            <span className="auth-logo-text">Voice Assistant</span>
+          </div>
+          <div className="confirm-icon">📧</div>
+          <h1 className="auth-title">Check your email</h1>
+          <p className="auth-sub" style={{ maxWidth: 300, margin: '0 auto 1.5rem' }}>
+            We sent a confirmation link to <strong>{form.email}</strong>.
+            Click it to activate your account, then come back to sign in.
+          </p>
+          <button className="auth-btn" onClick={onSwitch}>Go to sign in</button>
+        </div>
+        <div className="auth-side">
+          <div className="auth-side-inner">
+            <h2 className="side-title">Almost there!</h2>
+            <p className="side-desc">One click in your inbox and you're in. Your voice profile will be waiting.</p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -49,7 +81,7 @@ export default function SignupPage({ onSwitch }) {
       <div className="auth-side">
         <div className="auth-side-inner">
           <h2 className="side-title">Posts that sound like <em>you</em></h2>
-          <p className="side-desc">The AI studies how you write, then generates LinkedIn posts that are indistinguishable from your own voice.</p>
+          <p className="side-desc">The AI studies how you write, then generates LinkedIn posts indistinguishable from your own voice.</p>
           <div className="side-steps">
             {[
               ['1', 'Paste your past posts'],
@@ -102,7 +134,6 @@ export default function SignupPage({ onSwitch }) {
             </div>
 
             {error && <p className="auth-error">{error}</p>}
-
             <button className="auth-btn" type="submit">Continue →</button>
           </form>
         )}
@@ -119,7 +150,7 @@ export default function SignupPage({ onSwitch }) {
             </div>
 
             <div className="step2-note">
-              These help personalize your experience. You can always update them in your profile later.
+              These help personalize your experience. You can update them anytime in your profile.
             </div>
 
             {error && <p className="auth-error">{error}</p>}

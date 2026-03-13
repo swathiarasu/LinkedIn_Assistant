@@ -25,7 +25,6 @@
   to   { transform: translateX(0);    opacity: 1; }
 }
 
-/* ── Panel header ── */
 .panel-header {
   display: flex;
   justify-content: space-between;
@@ -56,7 +55,6 @@
 }
 .close-btn:hover { background: #f4f2ee; color: #1a1a1a; }
 
-/* ── Hero ── */
 .pp-hero {
   display: flex;
   align-items: center;
@@ -84,7 +82,6 @@
 .pp-email    { font-size: 12px; color: #888; margin-bottom: 3px; }
 .pp-headline { font-size: 12px; color: #0a66c2; font-weight: 500; }
 
-/* ── Stats ── */
 .pp-stats {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -104,7 +101,6 @@
 .stat-num   { font-size: 18px; font-weight: 700; color: #0a66c2; }
 .stat-label { font-size: 11px; color: #aaa; text-align: center; }
 
-/* ── Sections ── */
 .pp-section { padding: 1.25rem 1.5rem; border-bottom: 1px solid #f0ede8; }
 
 .pp-section-header {
@@ -128,8 +124,7 @@
 }
 .edit-btn:hover { background: #f0f7ff; }
 
-/* ── Detail list ── */
-.detail-list { display: flex; flex-direction: column; gap: 0; }
+.detail-list { display: flex; flex-direction: column; }
 
 .detail-row {
   display: flex;
@@ -157,19 +152,15 @@
 }
 
 .empty { color: #ccc; font-style: italic; }
+
 .pp-link { color: #0a66c2; text-decoration: none; font-size: 12px; }
 .pp-link:hover { text-decoration: underline; }
 
-/* ── Edit form ── */
 .edit-form { display: flex; flex-direction: column; gap: 12px; }
 
 .field { display: flex; flex-direction: column; gap: 5px; }
 
-.field-label {
-  font-size: 12px;
-  font-weight: 500;
-  color: #555;
-}
+.field-label { font-size: 12px; font-weight: 500; color: #555; }
 
 .field-input {
   padding: 9px 12px;
@@ -179,6 +170,7 @@
   outline: none;
   background: #fafaf9;
   transition: border-color 0.2s;
+  font-family: inherit;
 }
 .field-input:focus { border-color: #0a66c2; background: #fff; }
 
@@ -199,6 +191,7 @@
   font-size: 13px;
   color: #666;
   cursor: pointer;
+  font-family: inherit;
 }
 .cancel-btn:hover { background: #f4f2ee; }
 
@@ -211,10 +204,11 @@
   border: none;
   border-radius: 8px;
   cursor: pointer;
+  font-family: inherit;
 }
-.save-btn:hover { background: #004182; }
+.save-btn:hover:not(:disabled) { background: #004182; }
+.save-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* ── Save toast ── */
 .save-toast {
   margin: 0 1.5rem;
   padding: 10px 14px;
@@ -227,7 +221,21 @@
   text-align: center;
 }
 
-/* ── Footer ── */
+/* Auth badge */
+.auth-badge {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12px;
+  color: #888;
+  line-height: 1.5;
+  background: #f9f8f6;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.auth-badge-icon { flex-shrink: 0; }
+.auth-badge strong { color: #3ecf8e; }
+
 .pp-footer {
   margin-top: auto;
   padding: 1.5rem;
@@ -245,5 +253,6 @@
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.15s;
+  font-family: inherit;
 }
 .signout-btn:hover { background: #fff4f4; }

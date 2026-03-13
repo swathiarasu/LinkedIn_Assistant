@@ -1,8 +1,8 @@
-// Gemini Flash API
-// Model: gemini-2.0-flash (free tier at aistudio.google.com)
+// Gemini API
+// Model: gemini-2.5-flash-lite (free tier at aistudio.google.com)
 
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY
-const BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent'
+const BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent'
 
 const callGemini = async (systemPrompt, userMessage, maxTokens = 2048) => {
   const res = await fetch(`${BASE_URL}?key=${API_KEY}`, {
@@ -21,7 +21,7 @@ const callGemini = async (systemPrompt, userMessage, maxTokens = 2048) => {
       generationConfig: {
         maxOutputTokens: maxTokens,
         temperature: 0.7,
-        responseMimeType: 'application/json', // force Gemini to return raw JSON
+        responseMimeType: 'application/json',
       },
     }),
   })
@@ -38,26 +38,19 @@ const callGemini = async (systemPrompt, userMessage, maxTokens = 2048) => {
 }
 
 const parseJSON = (text) => {
-  // 1. Try parsing directly (responseMimeType:json should give clean output)
   try { return JSON.parse(text.trim()) } catch {}
-
-  // 2. Strip markdown code fences and retry
   try {
     const stripped = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim()
     return JSON.parse(stripped)
   } catch {}
-
-  // 3. Extract first complete JSON object or array
   try {
     const objMatch = text.match(/\{[\s\S]*\}/)
     if (objMatch) return JSON.parse(objMatch[0])
   } catch {}
-
   try {
     const arrMatch = text.match(/\[[\s\S]*\]/)
     if (arrMatch) return JSON.parse(arrMatch[0])
   } catch {}
-
   return null
 }
 
