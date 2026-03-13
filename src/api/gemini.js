@@ -1,10 +1,10 @@
-// Gemini Flash API
-// Model: gemini-2.5-flash (free tier at aistudio.google.com)
+// Gemini API
+// Model: gemini-2.5-flash-lite — thinking OFF by default, fastest stable model
 
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY
-const BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent'
+const BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent'
 
-const callGemini = async (systemPrompt, userMessage, maxTokens = 2048) => {
+const callGemini = async (systemPrompt, userMessage, maxTokens = 1024) => {
   const res = await fetch(`${BASE_URL}?key=${API_KEY}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -13,15 +13,12 @@ const callGemini = async (systemPrompt, userMessage, maxTokens = 2048) => {
         parts: [{ text: systemPrompt }],
       },
       contents: [
-        {
-          role: 'user',
-          parts: [{ text: userMessage }],
-        },
+        { role: 'user', parts: [{ text: userMessage }] },
       ],
       generationConfig: {
         maxOutputTokens: maxTokens,
         temperature: 0.7,
-        responseMimeType: 'application/json', // force Gemini to return raw JSON
+        responseMimeType: 'application/json',
       },
     }),
   })
@@ -32,104 +29,63 @@ const callGemini = async (systemPrompt, userMessage, maxTokens = 2048) => {
   }
 
   const data = await res.json()
-  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text
+
+  const parts = data?.candidates?.[0]?.content?.parts || []
+  const text = parts
+    .filter(p => p.text && !p.thought)
+    .map(p => p.text)
+    .join('')
+    .trim()
+
   if (!text) throw new Error('Empty response from Gemini — check your API key')
   return text
 }
 
 const parseJSON = (text) => {
-  // 1. Try parsing directly (responseMimeType:json should give clean output)
   try { return JSON.parse(text.trim()) } catch {}
-
-  // 2. Strip markdown code fences and retry
   try {
-    const stripped = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim()
-    return JSON.parse(stripped)
+    const s = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim()
+    return JSON.parse(s)
   } catch {}
-
-  // 3. Extract first complete JSON object or array
   try {
-    const objMatch = text.match(/\{[\s\S]*\}/)
-    if (objMatch) return JSON.parse(objMatch[0])
+    const m = text.match(/\{[\s\S]*\}/)
+    if (m) return JSON.parse(m[0])
   } catch {}
-
   try {
-    const arrMatch = text.match(/\[[\s\S]*\]/)
-    if (arrMatch) return JSON.parse(arrMatch[0])
+    const m = text.match(/\[[\s\S]*\]/)
+    if (m) return JSON.parse(m[0])
   } catch {}
-
+  console.error('JSON parse failed. Raw:', text)
   return null
 }
 
-// ─── Analyze persona profile from pasted posts ─────────────────────────────────
+// ── Analyze persona profile ───────────────────────────────────────────────
 export const analyzePersona = async (posts) => {
-  const postsText = posts.join('\n\n---\n\n')
+  const postsText = posts.slice(0, 8).join('\n\n---\n\n')
 
-  const system = `You are an expert LinkedIn persona analyst. Study the provided posts and return a JSON object with EXACTLY these keys:
-{
-  "name": "inferred author name, or You if unclear",
-  "tone": "2-4 word phrase e.g. Analytical and direct",
-  "style": "2-4 word phrase e.g. Story-led with sharp takeaways",
-  "themes": ["theme1", "theme2", "theme3"],
-  "vocab": ["signature phrase 1", "signature phrase 2", "signature phrase 3"],
-  "postLength": "short or medium or long",
-  "opensWith": "how they typically begin posts",
-  "avoids": "stylistic things they never do",
-  "engagementStyle": "how they invite readers in",
-  "summary": "2-sentence summary of their LinkedIn writing personality"
-}
-Return ONLY the JSON object. No explanation, no markdown, no extra text.`
+  const system = `LinkedIn persona analyst. Return JSON only, no markdown:
+{"name":"string","tone":"2-4 words","style":"2-4 words","themes":["t1","t2","t3"],"vocab":["p1","p2","p3"],"postLength":"short|medium|long","opensWith":"string","avoids":"string","engagementStyle":"string","summary":"2 sentences"}`
 
-  const raw = await callGemini(
-    system,
-    `Here are my LinkedIn posts:\n\n${postsText}\n\nAnalyze my voice and return the JSON profile.`,
-    1200
-  )
-
+  const raw = await callGemini(system, `Analyze these posts:\n\n${postsText}`, 512)
   const profile = parseJSON(raw)
   if (!profile || typeof profile !== 'object' || Array.isArray(profile)) {
-    console.error('Raw Gemini response:', raw)
     throw new Error('Could not parse persona profile. Please try again.')
   }
   return profile
 }
 
-// ─── Generate post drafts ─────────────────────────────────────────────────────
+// ── Generate post drafts ──────────────────────────────────────────────────
 export const generateDrafts = async (profile, topic, ideaSeed = '') => {
-  const memCtx = ideaSeed.trim()
-    ? `\n\nAlso incorporate this rough thought if relevant: "${ideaSeed}"`
-    : ''
+  const memCtx = ideaSeed.trim() ? ` Also weave in: "${ideaSeed}".` : ''
 
-  const system = `You are a world-class LinkedIn ghostwriter who mimics the author's voice exactly.
-Return a JSON array with EXACTLY 3 objects, each with these keys:
-[
-  {
-    "label": "Version A — StyleName",
-    "post": "full post text with natural line breaks",
-    "why": "one sentence on why this sounds like the author"
-  },
-  { "label": "Version B — StyleName", "post": "...", "why": "..." },
-  { "label": "Version C — StyleName", "post": "...", "why": "..." }
-]
-Rules:
-- Post length: ${profile.postLength}
-- Opens with: ${profile.opensWith}
-- Avoids: ${profile.avoids}
-- Use their signature vocabulary naturally
-- Max 2-3 hashtags only if they normally use them
-- Make the 3 versions meaningfully different in structure
-Return ONLY the JSON array. No markdown, no explanation.`
+  const system = `LinkedIn ghostwriter. Mimic this voice:
+Tone:${profile.tone}|Style:${profile.style}|Length:${profile.postLength}|Opens:${profile.opensWith}|Avoids:${profile.avoids}|Vocab:${(profile.vocab||[]).join(',')}
+Return JSON array only:
+[{"label":"Version A — Name","post":"post text here","why":"one sentence"},{"label":"Version B — Name","post":"post text here","why":"one sentence"},{"label":"Version C — Name","post":"post text here","why":"one sentence"}]
+3 different styles. Max 2 hashtags only if they normally use them.`
 
-  const raw = await callGemini(
-    system,
-    `Topic I want to post about: ${topic}${memCtx}\n\nMy voice profile:\n${JSON.stringify(profile, null, 2)}`,
-    4000
-  )
-
+  const raw = await callGemini(system, `Topic: ${topic}.${memCtx}`, 1000)
   const drafts = parseJSON(raw)
-  if (!Array.isArray(drafts)) {
-    console.error('Raw Gemini response:', raw)
-    throw new Error('Could not parse drafts. Please try again.')
-  }
+  if (!Array.isArray(drafts)) throw new Error('Could not parse drafts. Please try again.')
   return drafts
 }
