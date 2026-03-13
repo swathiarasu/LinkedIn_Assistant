@@ -77,6 +77,20 @@ export default function DraftsStep({ profile, topic, ideaSeed, drafts, setDrafts
     setPosting(p => ({ ...p, [i]: 'done' }))
   }
 
+  // Opens LinkedIn feed with post text pre-filled in the composer
+  const handlePostToLinkedIn = async (draft, i) => {
+    // Copy to clipboard as backup in case URL gets truncated
+    try { await navigator.clipboard.writeText(draft.post) } catch {}
+
+    // LinkedIn share URL — pre-fills the post composer
+    const encoded = encodeURIComponent(draft.post)
+    const url = `https://www.linkedin.com/feed/?shareActive=true&text=${encoded}`
+    window.open(url, '_blank', 'noopener,noreferrer')
+
+    setPosting(i)
+    setTimeout(() => setPosting(null), 3000)
+  }
+
   if (loading) {
     return (
       <Card className="center-card">

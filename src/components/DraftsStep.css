@@ -32,6 +32,7 @@
 
 .error-msg { font-size: 13px; color: #b74444; margin-bottom: 14px; }
 
+/* Header */
 .drafts-header {
   display: flex;
   justify-content: space-between;
@@ -42,6 +43,7 @@
 .drafts-topic { font-size: 13px; color: #666; }
 .drafts-topic strong { color: #1a1a1a; }
 
+/* Card */
 .draft-card { padding: 1.25rem 1.5rem !important; }
 
 /* Top row */
