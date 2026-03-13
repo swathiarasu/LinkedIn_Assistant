@@ -119,7 +119,7 @@ Rules:
   const raw = await callGemini(
     system,
     `Topic I want to post about: ${topic}${memCtx}\n\nMy voice profile:\n${JSON.stringify(profile, null, 2)}`,
-    2000
+    4000
   )
 
   const drafts = parseJSON(raw)
