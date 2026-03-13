@@ -8,7 +8,7 @@ import './ProfileStep.css'
 export default function ProfileStep({ posts, onDone, onBack, ideaSeed, setIdeaSeed }) {
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
+  const [error, setError]     = useState('')
   const [memoryOpen, setMemoryOpen] = useState(false)
 
   useEffect(() => { runAnalysis() }, [])
@@ -103,7 +103,7 @@ export default function ProfileStep({ posts, onDone, onBack, ideaSeed, setIdeaSe
           <div>
             <span className="memory-title">💡 Idea Memory</span>
             <span className="memory-badge">optional</span>
-            <p className="memory-desc">Got a half-formed thought, note, or bookmark? Drop it here — the AI will shape it into a post idea.</p>
+            <p className="memory-desc">Got a half-formed thought? Drop it here — the AI will weave it into your post.</p>
           </div>
           <span className="chevron">{memoryOpen ? '▲' : '▼'}</span>
         </div>
@@ -112,7 +112,7 @@ export default function ProfileStep({ posts, onDone, onBack, ideaSeed, setIdeaSe
             className="memory-textarea"
             value={ideaSeed}
             onChange={e => setIdeaSeed(e.target.value)}
-            placeholder="e.g. 'something about how async work changes trust in remote teams — haven't figured out the angle yet...'"
+            placeholder="e.g. 'something about how async work changes trust in remote teams...'"
             rows={3}
           />
         )}
