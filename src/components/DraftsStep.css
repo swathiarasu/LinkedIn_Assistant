@@ -32,19 +32,21 @@
 
 .error-msg { font-size: 13px; color: #b74444; margin-bottom: 14px; }
 
+/* Header */
 .drafts-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 16px;
 }
-
 .drafts-title { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
 .drafts-topic { font-size: 13px; color: #666; }
 .drafts-topic strong { color: #1a1a1a; }
 
+/* Card */
 .draft-card { padding: 1.25rem 1.5rem !important; }
 
+/* Top row */
 .draft-top {
   display: flex;
   justify-content: space-between;
@@ -52,13 +54,9 @@
   margin-bottom: 12px;
 }
 
-/* Copy + Save buttons sit together on the right */
-.draft-actions {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-}
+.draft-actions { display: flex; gap: 6px; align-items: center; }
 
+/* Copy button */
 .copy-btn {
   font-size: 12px;
   font-weight: 500;
@@ -89,9 +87,10 @@
 }
 .save-btn:hover:not(:disabled) { background: #0a66c2; color: #fff; border-color: #0a66c2; }
 .save-btn:disabled { cursor: not-allowed; opacity: 0.6; }
-.save-btn.saved  { background: #e8f5eb; border-color: #a3d9ac; color: #2d7a3a; }
-.save-btn.error  { background: #fff4f4; border-color: #f5c0c0; color: #b74444; }
+.save-btn.saved { background: #e8f5eb; border-color: #a3d9ac; color: #2d7a3a; }
+.save-btn.error { background: #fff4f4; border-color: #f5c0c0; color: #b74444; }
 
+/* Post text */
 .draft-text {
   font-family: inherit;
   font-size: 14px;
@@ -104,9 +103,51 @@
   border-bottom: 1px solid #f0ede8;
 }
 
-.draft-why { font-size: 12px; color: #888; line-height: 1.5; }
+/* Footer row */
+.draft-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.draft-why {
+  font-size: 12px;
+  color: #888;
+  line-height: 1.5;
+  flex: 1;
+  min-width: 0;
+}
 .why-label { font-weight: 600; color: #666; }
 
+/* LinkedIn button */
+.linkedin-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 18px;
+  background: #0a66c2;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-family: inherit;
+  transition: background 0.15s, transform 0.1s;
+}
+.linkedin-btn:hover:not(:disabled) {
+  background: #004182;
+  transform: translateY(-1px);
+}
+.linkedin-btn:active { transform: translateY(0); }
+.linkedin-btn:disabled { opacity: 0.65; cursor: not-allowed; }
+.linkedin-btn.opening { background: #2d8a4e; }
+
+/* Bottom actions */
 .row-actions {
   display: flex;
   justify-content: space-between;
