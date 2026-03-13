@@ -22,6 +22,7 @@ const callGemini = async (systemPrompt, userMessage, maxTokens = 2048) => {
         maxOutputTokens: maxTokens,
         temperature: 0.7,
         responseMimeType: 'application/json', // force Gemini to return raw JSON
+        thinkingConfig: { thinkingBudget: 0 }, // disable thinking for faster responses
       },
     }),
   })

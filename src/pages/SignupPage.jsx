@@ -57,13 +57,13 @@ export default function SignupPage({ onSwitch }) {
       <div className="auth-side">
         <div className="auth-side-inner">
           <h2 className="side-title">Posts that sound like <em>you</em></h2>
-          <p className="side-desc">The AI studies how you write, then generates LinkedIn posts indistinguishable from your own voice.</p>
+          <p className="side-desc">The AI studies how you write, then generates LinkedIn posts indistinguishable from your own persona.</p>
           <div className="side-steps">
             {[
               ['1', 'Paste your past posts'],
-              ['2', 'AI builds your voice profile'],
+              ['2', 'AI builds your persona profile'],
               ['3', 'Pick a topic to write about'],
-              ['4', 'Get 3 drafts in your voice'],
+              ['4', 'Get 3 drafts in your persona'],
             ].map(([n, label]) => (
               <div key={n} className="side-step">
                 <span className="step-num">{n}</span>
@@ -77,7 +77,7 @@ export default function SignupPage({ onSwitch }) {
       <div className="auth-card">
         <div className="auth-logo">
           <span className="auth-logo-icon">in</span>
-          <span className="auth-logo-text">Voice Assistant</span>
+          <span className="auth-logo-text">Persona Assistant</span>
         </div>
 
         <div className="signup-progress">

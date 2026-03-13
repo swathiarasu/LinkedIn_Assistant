@@ -29,11 +29,11 @@ export default function LoginPage({ onSwitch }) {
       <div className="auth-card">
         <div className="auth-logo">
           <span className="auth-logo-icon">in</span>
-          <span className="auth-logo-text">Voice Assistant</span>
+          <span className="auth-logo-text">Persona Assistant</span>
         </div>
 
         <h1 className="auth-title">Welcome back</h1>
-        <p className="auth-sub">Sign in to continue building your personal voice</p>
+        <p className="auth-sub">Sign in to continue building your personal persona</p>
 
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="field">
@@ -79,12 +79,12 @@ export default function LoginPage({ onSwitch }) {
       <div className="auth-side">
         <div className="auth-side-inner">
           <h2 className="side-title">Posts that sound like <em>you</em></h2>
-          <p className="side-desc">Paste your LinkedIn posts. The AI learns your voice — your tone, your themes, your style — then writes new posts indistinguishable from your own.</p>
+          <p className="side-desc">Paste your LinkedIn posts. The AI learns your persona — your tone, your themes, your style — then writes new posts indistinguishable from your own.</p>
           <div className="side-features">
             {[
-              ['🎯', 'Voice profiling', 'Learns your tone, vocabulary & writing patterns'],
+              ['🎯', 'Persona profiling', 'Learns your tone, vocabulary & writing patterns'],
               ['💡', 'Idea memory', 'Turns rough notes into polished post ideas'],
-              ['✍️', '3 draft variations', 'Multiple styles, all written in your voice'],
+              ['✍️', '3 draft variations', 'Multiple styles, all written in your persona'],
             ].map(([icon, title, desc]) => (
               <div key={title} className="side-feature">
                 <span className="sf-icon">{icon}</span>
