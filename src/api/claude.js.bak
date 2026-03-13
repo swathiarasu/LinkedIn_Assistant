@@ -1,0 +1,107 @@
+const API_URL = 'https://api.anthropic.com/v1/messages'
+const API_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY
+
+const callClaude = async (system, userMessage, maxTokens = 1500) => {
+  const res = await fetch(API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': API_KEY,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true',
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: maxTokens,
+      system,
+      messages: [{ role: 'user', content: userMessage }],
+    }),
+  })
+
+  if (!res.ok) {
+    const err = await res.json()
+    throw new Error(err?.error?.message || 'Claude API error')
+  }
+
+  const data = await res.json()
+  return data.content.map(b => b.text || '').join('')
+}
+
+const parseJSON = (text) => {
+  try {
+    return JSON.parse(text.replace(/```json|```/g, '').trim())
+  } catch {
+    return null
+  }
+}
+
+// ─── Analyze voice profile from pasted posts ─────────────────────────────────
+export const analyzeVoice = async (posts) => {
+  const postsText = posts.join('\n\n---\n\n')
+
+  const system = `You are an expert LinkedIn voice analyst. Study the provided posts deeply and return ONLY a valid JSON object — no markdown, no backticks, no explanation. Use this exact schema:
+{
+  "name": "inferred author name, or 'You' if unclear",
+  "tone": "2-4 word phrase describing their tone (e.g. 'Analytical and direct')",
+  "style": "2-4 word phrase describing writing style (e.g. 'Story-led with sharp takeaways')",
+  "themes": ["theme1", "theme2", "theme3"],
+  "vocab": ["a signature phrase or word they use", "another one", "another one"],
+  "postLength": "short or medium or long",
+  "opensWith": "how they typically begin posts (e.g. 'A personal story or observation')",
+  "avoids": "stylistic things they never do (e.g. 'Generic advice and hashtag spam')",
+  "engagementStyle": "how they invite readers in (e.g. 'Ends with a question' or 'Uses bold statements')",
+  "summary": "2-sentence summary of their LinkedIn writing personality"
+}`
+
+  const raw = await callClaude(system, `Here are my LinkedIn posts:\n\n${postsText}\n\nAnalyze my voice and return the JSON profile.`, 900)
+  const profile = parseJSON(raw)
+  if (!profile) throw new Error('Could not parse voice profile')
+  return profile
+}
+
+// ─── Generate post drafts ─────────────────────────────────────────────────────
+export const generateDrafts = async (profile, topic, ideaSeed = '') => {
+  const memCtx = ideaSeed.trim()
+    ? `\n\nThe user also has this rough unfinished thought to incorporate if relevant: "${ideaSeed}"`
+    : ''
+
+  const system = `You are a world-class LinkedIn ghostwriter. Your job is to write posts that are indistinguishable from the real author. You have been given a detailed voice profile. You must match their tone, vocabulary, opening style, post length, and engagement style exactly.
+
+Return ONLY a valid JSON array — no markdown, no backticks, no extra text:
+[
+  {
+    "label": "Version A — [creative style name]",
+    "post": "the full post text, formatted exactly as LinkedIn posts are (line breaks, short punchy paragraphs, etc.)",
+    "why": "one sentence explaining what makes this version true to their voice"
+  },
+  {
+    "label": "Version B — [creative style name]",
+    "post": "...",
+    "why": "..."
+  },
+  {
+    "label": "Version C — [creative style name]",
+    "post": "...",
+    "why": "..."
+  }
+]
+
+Rules:
+- Each version must feel like the author actually wrote it — not generic LinkedIn content
+- Match their exact post length preference: ${profile.postLength}
+- Open posts the way they do: ${profile.opensWith}
+- Use their vocabulary and signature phrases naturally
+- Avoid what they avoid: ${profile.avoids}
+- Max 2-3 hashtags only if the author uses them; otherwise none
+- Make the 3 versions meaningfully different (e.g. story-driven vs. insight-driven vs. opinion-driven)`
+
+  const raw = await callClaude(
+    system,
+    `Topic I want to post about: ${topic}${memCtx}\n\nMy voice profile:\n${JSON.stringify(profile, null, 2)}`,
+    2000
+  )
+
+  const drafts = parseJSON(raw)
+  if (!Array.isArray(drafts)) throw new Error('Could not parse drafts')
+  return drafts
+}

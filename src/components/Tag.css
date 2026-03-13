@@ -1,0 +1,16 @@
+.tag {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-right: 6px;
+  margin-bottom: 6px;
+}
+
+.tag-purple { background: #EEEDFE; color: #3C3489; }
+.tag-teal   { background: #E1F5EE; color: #085041; }
+.tag-coral  { background: #FAECE7; color: #712B13; }
+.tag-blue   { background: #dce6f7; color: #0a66c2; }
+.tag-amber  { background: #FAEEDA; color: #633806; }
+.tag-gray   { background: #F1EFE8; color: #444441; }

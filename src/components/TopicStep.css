@@ -1,0 +1,51 @@
+.topic-title { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
+.topic-sub   { font-size: 13px; color: #666; line-height: 1.6; margin-bottom: 14px; }
+
+.topic-input {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 14px;
+  line-height: 1.6;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  resize: vertical;
+  outline: none;
+  background: #fafaf9;
+  transition: border-color 0.2s;
+}
+.topic-input:focus { border-color: #0a66c2; background: #fff; }
+
+.ideas-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #bbb;
+  font-weight: 600;
+  margin: 18px 0 8px;
+}
+
+.ideas-list { display: flex; flex-direction: column; gap: 6px; }
+
+.idea-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1px solid #e0ddd8;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #444;
+  cursor: pointer;
+  background: #fafaf9;
+  transition: border-color 0.15s, background 0.15s;
+}
+.idea-chip:hover { border-color: #0a66c2; background: #f0f7ff; color: #0a66c2; }
+.idea-chip.selected { border-color: #0a66c2; background: #f0f7ff; color: #0a66c2; font-weight: 500; }
+
+.idea-icon { font-size: 15px; flex-shrink: 0; }
+
+.row-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

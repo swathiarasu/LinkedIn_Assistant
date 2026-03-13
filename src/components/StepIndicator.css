@@ -1,0 +1,35 @@
+.steps {
+  display: flex;
+  gap: 0;
+  margin-bottom: 1.75rem;
+}
+
+.step { flex: 1; }
+
+.step-track {
+  height: 3px;
+  background: #e0ddd8;
+  border-radius: 2px;
+  margin-bottom: 6px;
+  overflow: hidden;
+}
+
+.step-fill {
+  height: 100%;
+  width: 0%;
+  background: #0a66c2;
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+.step.done .step-fill { width: 100%; }
+.step.active .step-fill { width: 50%; }
+
+.step-label {
+  font-size: 11px;
+  color: #bbb;
+  transition: color 0.3s;
+}
+
+.step.active .step-label { color: #0a66c2; font-weight: 600; }
+.step.done .step-label { color: #555; }
