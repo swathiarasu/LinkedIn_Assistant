@@ -36,7 +36,7 @@ export default function DraftsStep({ profile, topic, ideaSeed, drafts, setDrafts
     return (
       <Card className="center-card">
         <div className="spinner" />
-        <p className="loading-title">Writing in your voice...</p>
+        <p className="loading-title">Writing in your persona...</p>
         <p className="loading-sub">Generating 3 variations that sound like you</p>
         <div className="progress-bar"><div className="progress-fill" /></div>
       </Card>

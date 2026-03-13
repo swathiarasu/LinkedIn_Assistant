@@ -56,9 +56,9 @@
 
 .profile-name { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
 
-.voice-pills { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.persona-pills { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 
-.voice-pill {
+.persona-pill {
   background: #f0f7ff;
   color: #0a66c2;
   font-size: 12px;
@@ -68,7 +68,7 @@
   border: 1px solid #c8dff7;
 }
 
-.voice-dot { color: #bbb; font-size: 14px; }
+.persona-dot { color: #bbb; font-size: 14px; }
 
 .profile-summary {
   font-size: 13px;
