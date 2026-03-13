@@ -8,14 +8,14 @@ export default function SignupPage({ onSwitch }) {
     name: '', email: '', password: '', confirm: '',
     headline: '', linkedinUrl: '',
   })
-  const [error, setError] = useState('')
+  const [error, setError]     = useState('')
   const [loading, setLoading] = useState(false)
-  const [step, setStep] = useState(1) // 2-step signup
+  const [step, setStep]       = useState(1)
 
   const set = (k, v) => { setForm(f => ({ ...f, [k]: v })); setError('') }
 
   const validateStep1 = () => {
-    if (!form.name.trim()) return 'Please enter your name.'
+    if (!form.name.trim())  return 'Please enter your name.'
     if (!form.email.trim()) return 'Please enter your email.'
     if (!/\S+@\S+\.\S+/.test(form.email)) return 'Please enter a valid email.'
     if (form.password.length < 6) return 'Password must be at least 6 characters.'
@@ -30,18 +30,26 @@ export default function SignupPage({ onSwitch }) {
     setStep(2)
   }
 
-  const handleSubmit = (e) => {
+  // ── Step 2 submit — calls Supabase ────────────────────────────────────────
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
-    const res = signup({
-      name: form.name.trim(),
-      email: form.email.trim().toLowerCase(),
-      password: form.password,
-      headline: form.headline.trim(),
+    setError('')
+
+    const res = await signup({
+      name:        form.name.trim(),
+      email:       form.email.trim().toLowerCase(),
+      password:    form.password,
+      headline:    form.headline.trim(),
       linkedinUrl: form.linkedinUrl.trim(),
     })
-    if (res.error) setError(res.error)
-    setLoading(false)
+
+    if (res?.error) {
+      setError(res.error)
+      setLoading(false)
+    }
+    // On success, AuthContext's onAuthStateChange fires automatically
+    // and redirects the user — no need to do anything here
   }
 
   return (
@@ -49,7 +57,7 @@ export default function SignupPage({ onSwitch }) {
       <div className="auth-side">
         <div className="auth-side-inner">
           <h2 className="side-title">Posts that sound like <em>you</em></h2>
-          <p className="side-desc">The AI studies how you write, then generates LinkedIn posts that are indistinguishable from your own voice.</p>
+          <p className="side-desc">The AI studies how you write, then generates LinkedIn posts indistinguishable from your own voice.</p>
           <div className="side-steps">
             {[
               ['1', 'Paste your past posts'],
@@ -100,9 +108,7 @@ export default function SignupPage({ onSwitch }) {
                 <input className="field-input" type="password" value={form.confirm} onChange={e => set('confirm', e.target.value)} placeholder="Repeat password" />
               </div>
             </div>
-
             {error && <p className="auth-error">{error}</p>}
-
             <button className="auth-btn" type="submit">Continue →</button>
           </form>
         )}
@@ -117,13 +123,10 @@ export default function SignupPage({ onSwitch }) {
               <label className="field-label">LinkedIn profile URL <span className="optional">optional</span></label>
               <input className="field-input" value={form.linkedinUrl} onChange={e => set('linkedinUrl', e.target.value)} placeholder="https://linkedin.com/in/yourname" />
             </div>
-
             <div className="step2-note">
-              These help personalize your experience. You can always update them in your profile later.
+              These help personalize your experience. You can update them anytime in your profile.
             </div>
-
             {error && <p className="auth-error">{error}</p>}
-
             <div className="form-row-actions">
               <button type="button" className="auth-btn-ghost" onClick={() => { setStep(1); setError('') }}>← Back</button>
               <button className="auth-btn" type="submit" disabled={loading}>

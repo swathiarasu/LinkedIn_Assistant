@@ -1,82 +1,109 @@
 import { createContext, useContext, useState, useEffect } from 'react'
+import { supabase } from '../api/supabase'
 
 const AuthContext = createContext(null)
 
-// Simple local auth — stores users in localStorage (perfect for hackathon demo)
-const USERS_KEY = 'lva_users'
-const SESSION_KEY = 'lva_session'
-
-const getUsers = () => JSON.parse(localStorage.getItem(USERS_KEY) || '{}')
-const saveUsers = (users) => localStorage.setItem(USERS_KEY, JSON.stringify(users))
-const getSession = () => JSON.parse(localStorage.getItem(SESSION_KEY) || 'null')
-const saveSession = (user) => localStorage.setItem(SESSION_KEY, JSON.stringify(user))
-const clearSession = () => localStorage.removeItem(SESSION_KEY)
-
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(getSession)
+  const [user, setUser]       = useState(null)
+  const [profile, setProfile] = useState(null)
+  const [loading, setLoading] = useState(true)
 
-  const signup = ({ name, email, password, headline, linkedinUrl }) => {
-    const users = getUsers()
-    if (users[email]) return { error: 'An account with this email already exists.' }
+  useEffect(() => {
+    // Restore existing session on mount
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        setUser(session.user)
+        fetchProfile(session.user.id)
+      } else {
+        setLoading(false)
+      }
+    })
 
-    const newUser = {
-      id: crypto.randomUUID(),
-      name,
+    // Listen for login / logout / token refresh
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setUser(session.user)
+        fetchProfile(session.user.id)
+      } else {
+        setUser(null)
+        setProfile(null)
+        setLoading(false)
+      }
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  const fetchProfile = async (userId) => {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single()
+    if (!error && data) setProfile(data)
+    setLoading(false)
+  }
+
+  // ── Sign up ───────────────────────────────────────────────────────────────
+  const signup = async ({ name, email, password, headline, linkedinUrl }) => {
+    // 1. Create auth user
+    const { data, error } = await supabase.auth.signUp({
       email,
-      password, // NOTE: plaintext for demo — use hashing in production
-      headline: headline || '',
-      linkedinUrl: linkedinUrl || '',
-      createdAt: new Date().toISOString(),
-      postsAnalyzed: 0,
-      draftsGenerated: 0,
+      password,
+      options: { data: { name } },
+    })
+    if (error) return { error: error.message }
+
+    // 2. Upsert profile row (also covered by the DB trigger, but be explicit)
+    if (data.user) {
+      const { error: profileError } = await supabase.from('profiles').upsert({
+        id:               data.user.id,
+        name:             name,
+        email:            email,
+        headline:         headline || '',
+        linkedin_url:     linkedinUrl || '',
+        posts_analyzed:   0,
+        drafts_generated: 0,
+      })
+      if (profileError) console.error('Profile upsert error:', profileError.message)
     }
 
-    users[email] = newUser
-    saveUsers(users)
-
-    const sessionUser = { ...newUser }
-    delete sessionUser.password
-    saveSession(sessionUser)
-    setUser(sessionUser)
     return { success: true }
   }
 
-  const login = (email, password) => {
-    const users = getUsers()
-    const found = users[email]
-    if (!found) return { error: 'No account found with this email.' }
-    if (found.password !== password) return { error: 'Incorrect password.' }
-
-    const sessionUser = { ...found }
-    delete sessionUser.password
-    saveSession(sessionUser)
-    setUser(sessionUser)
+  // ── Log in ────────────────────────────────────────────────────────────────
+  const login = async (email, password) => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) return { error: error.message }
     return { success: true }
   }
 
-  const logout = () => {
-    clearSession()
-    setUser(null)
+  // ── Log out ───────────────────────────────────────────────────────────────
+  const logout = async () => {
+    await supabase.auth.signOut()
   }
 
-  const updateProfile = (updates) => {
-    const users = getUsers()
-    const updated = { ...users[user.email], ...updates }
-    users[user.email] = updated
-    saveUsers(users)
-
-    const sessionUser = { ...updated }
-    delete sessionUser.password
-    saveSession(sessionUser)
-    setUser(sessionUser)
+  // ── Update profile ────────────────────────────────────────────────────────
+  const updateProfile = async (updates) => {
+    if (!user) return
+    const { data, error } = await supabase
+      .from('profiles')
+      .update(updates)
+      .eq('id', user.id)
+      .select()
+      .single()
+    if (!error && data) setProfile(data)
+    return error ? { error: error.message } : { success: true }
   }
 
-  const incrementStats = (field) => {
-    updateProfile({ [field]: (user[field] || 0) + 1 })
+  // ── Increment usage stats ─────────────────────────────────────────────────
+  const incrementStats = async (field) => {
+    if (!profile) return
+    await updateProfile({ [field]: (profile[field] || 0) + 1 })
   }
 
   return (
-    <AuthContext.Provider value={{ user, signup, login, logout, updateProfile, incrementStats }}>
+    <AuthContext.Provider value={{ user, profile, loading, signup, login, logout, updateProfile, incrementStats }}>
       {children}
     </AuthContext.Provider>
   )

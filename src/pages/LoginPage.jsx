@@ -4,8 +4,8 @@ import './AuthPages.css'
 
 export default function LoginPage({ onSwitch }) {
   const { login } = useAuth()
-  const [form, setForm] = useState({ email: '', password: '' })
-  const [error, setError] = useState('')
+  const [form, setForm]       = useState({ email: '', password: '' })
+  const [error, setError]     = useState('')
   const [loading, setLoading] = useState(false)
 
   const set = (k, v) => { setForm(f => ({ ...f, [k]: v })); setError('') }
@@ -14,15 +14,19 @@ export default function LoginPage({ onSwitch }) {
     e.preventDefault()
     if (!form.email || !form.password) return setError('Please fill in all fields.')
     setLoading(true)
-    const res = login(form.email.trim().toLowerCase(), form.password)
-    if (res.error) setError(res.error)
-    setLoading(false)
+    setError('')
+
+    const res = await login(form.email.trim().toLowerCase(), form.password)
+    if (res?.error) {
+      setError(res.error)
+      setLoading(false)
+    }
+    // On success, AuthContext's onAuthStateChange fires and redirects automatically
   }
 
   return (
     <div className="auth-shell">
       <div className="auth-card">
-        {/* Logo */}
         <div className="auth-logo">
           <span className="auth-logo-icon">in</span>
           <span className="auth-logo-text">Voice Assistant</span>
@@ -43,7 +47,6 @@ export default function LoginPage({ onSwitch }) {
               autoFocus
             />
           </div>
-
           <div className="field">
             <label className="field-label">Password</label>
             <input
@@ -67,10 +70,9 @@ export default function LoginPage({ onSwitch }) {
           <button className="auth-link" onClick={onSwitch}>Create one</button>
         </p>
 
-        {/* Demo hint */}
         <div className="demo-hint">
-          <span className="demo-hint-icon">💡</span>
-          <span>Hackathon demo — accounts are stored locally in your browser.</span>
+          <span className="demo-hint-icon">🔒</span>
+          <span>Secured by Supabase — credentials stored safely in the cloud.</span>
         </div>
       </div>
 
