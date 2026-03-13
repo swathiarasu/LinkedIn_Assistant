@@ -10,18 +10,19 @@ import TopicStep from './components/TopicStep'
 import DraftsStep from './components/DraftsStep'
 import './App.css'
 
-// ── Inner app — only shown when logged in ──────────────────────────────────
+// ── Main app — shown when logged in ─────────────────────────────────────────
 function MainApp() {
-  const { user } = useAuth()
-  const [step, setStep] = useState(0)
-  const [posts, setPosts] = useState([])
+  const { user, profile } = useAuth()
+  const [step, setStep]           = useState(0)
+  const [posts, setPosts]         = useState([])
   const [voiceProfile, setVoiceProfile] = useState(null)
-  const [topic, setTopic] = useState('')
-  const [ideaSeed, setIdeaSeed] = useState('')
-  const [drafts, setDrafts] = useState([])
+  const [topic, setTopic]         = useState('')
+  const [ideaSeed, setIdeaSeed]   = useState('')
+  const [drafts, setDrafts]       = useState([])
   const [showProfile, setShowProfile] = useState(false)
 
-  const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+  const displayName = profile?.name || user?.email || 'You'
+  const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
 
   const restart = () => {
     setPosts([]); setVoiceProfile(null)
@@ -49,9 +50,7 @@ function MainApp() {
       <main className="main">
         <StepIndicator current={step} />
 
-        {step === 0 && (
-          <PasteStep onDone={(p) => { setPosts(p); setStep(1) }} />
-        )}
+        {step === 0 && <PasteStep onDone={(p) => { setPosts(p); setStep(1) }} />}
         {step === 1 && (
           <ProfileStep
             posts={posts}
@@ -88,18 +87,26 @@ function MainApp() {
   )
 }
 
-// ── Auth gate ───────────────────────────────────────────────────────────────
+// ── Auth gate ────────────────────────────────────────────────────────────────
 function AuthGate() {
-  const { user } = useAuth()
-  const [authMode, setAuthMode] = useState('login') // 'login' | 'signup'
+  const { user, loading } = useAuth()
+  const [authMode, setAuthMode] = useState('login')
+
+  // While Supabase is restoring the session, show a blank loader
+  if (loading) {
+    return (
+      <div className="boot-loader">
+        <div className="boot-spinner" />
+      </div>
+    )
+  }
 
   if (user) return <MainApp />
-
   if (authMode === 'login') return <LoginPage onSwitch={() => setAuthMode('signup')} />
   return <SignupPage onSwitch={() => setAuthMode('login')} />
 }
 
-// ── Root ────────────────────────────────────────────────────────────────────
+// ── Root ─────────────────────────────────────────────────────────────────────
 export default function App() {
   return (
     <AuthProvider>
